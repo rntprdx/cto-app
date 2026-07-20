@@ -1,0 +1,101 @@
+.authShell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.authCard {
+  width: 100%;
+  max-width: 640px;
+  padding: 2rem;
+  border-radius: 1.25rem;
+  background: white;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.1);
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.8rem;
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  color: #64748b;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  font: inherit;
+}
+
+.primaryButton {
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.8rem 1rem;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.error {
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.7rem;
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.footerText {
+  margin-top: 1rem;
+  color: #475569;
+}
+
+.footerText a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (max-width: 720px) {
+  .authCard {
+    padding: 1.5rem;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}

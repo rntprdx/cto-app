@@ -1,0 +1,74 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2,6,23,0.5);
+  z-index: 1200;
+}
+
+.modal {
+  background: white;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  width: 420px;
+  max-width: calc(100% - 32px);
+  box-shadow: 0 20px 40px rgba(2,6,23,0.2);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.close {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+}
+
+.form input {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #e6edf6;
+  border-radius: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.ghost {
+  background: #eef2f7;
+  border: none;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.primary {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  cursor: pointer;
+}
