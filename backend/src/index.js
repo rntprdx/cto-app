@@ -43,6 +43,11 @@ const ensureTables = async () => {
 
         await pool.query(`
             ALTER TABLE users
+            ALTER COLUMN email DROP NOT NULL;
+        `);
+
+        await pool.query(`
+            ALTER TABLE users
             ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'employee';
         `);
 
@@ -125,10 +130,10 @@ app.post('/api/auth/register', async (req, res) => {
         const status = isFirstUser ? 'approved' : 'pending';
 
         const { rows } = await pool.query(
-            `INSERT INTO users (email, password_hash, full_name, employee_no, position, office_division, monthly_salary, role, status)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-             RETURNING id, email, full_name, employee_no, position, office_division, monthly_salary, role, status`,
-            [null, passwordHash, full_name.trim(), normalizedEmployeeNo, position.trim(), office_division.trim(), Number(monthly_salary), role, status]
+            `INSERT INTO users (password_hash, full_name, employee_no, position, office_division, monthly_salary, role, status)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+             RETURNING id, full_name, employee_no, position, office_division, monthly_salary, role, status`,
+            [passwordHash, full_name.trim(), normalizedEmployeeNo, position.trim(), office_division.trim(), Number(monthly_salary), role, status]
         );
 
         const user = rows[0];
@@ -367,6 +372,26 @@ app.post('/api/admin/users/:id/credit', verifyToken, verifyAdmin, async (req, re
     } catch (error) {
         console.error('Admin credit error', error.stack);
         res.status(500).json({ error: 'Failed to add credit.' });
+    }
+});
+
+app.post('/api/admin/users/:id/deduct', verifyToken, verifyAdmin, async (req, res) => {
+    try {
+        const { hours, remarks } = req.body;
+        if (typeof hours === 'undefined' || Number(hours) <= 0) {
+            return res.status(400).json({ error: 'A positive deduction amount is required.' });
+        }
+
+        const deductionHours = -Math.abs(Number(hours));
+        const { rows } = await pool.query(
+            "INSERT INTO ledger(user_id, date, hours, remarks) VALUES($1, CURRENT_DATE, $2, $3) RETURNING id, user_id, to_char(date, 'YYYY-MM-DD') as date, hours, remarks",
+            [req.params.id, deductionHours, remarks || 'Admin deducted credit']
+        );
+
+        res.status(201).json(rows[0]);
+    } catch (error) {
+        console.error('Admin deduct error', error.stack);
+        res.status(500).json({ error: 'Failed to deduct credit.' });
     }
 });
 
