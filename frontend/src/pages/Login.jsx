@@ -6,7 +6,7 @@ import styles from './AuthPage.module.css';
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ employee_id: '', password: '' });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -26,7 +26,7 @@ function Login() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: form.email.trim(),
+          employee_id: form.employee_id.trim(),
           password: form.password,
         }),
       });
@@ -55,8 +55,8 @@ function Login() {
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <label>
-            Email address
-            <input type="email" name="email" value={form.email} onChange={handleChange} required />
+            Employee ID
+            <input name="employee_id" value={form.employee_id} onChange={handleChange} required />
           </label>
 
           <label>

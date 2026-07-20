@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import styles from './CtoForm.module.css';
 
 const initialForm = {
@@ -11,8 +12,15 @@ const initialForm = {
   dateOfFiling: new Date().toISOString().slice(0, 10),
 };
 
-function CtoForm({ balance, onBackToDashboard }) {
-  const [form, setForm] = useState(initialForm);
+function CtoForm({ balance, onBackToDashboard, onLogout }) {
+  const { user } = useAuth();
+  const [form, setForm] = useState(() => ({
+    ...initialForm,
+    employeeName: user?.full_name || initialForm.employeeName,
+    employeeNo: user?.employee_no || initialForm.employeeNo,
+    position: user?.position || initialForm.position,
+    officeDivision: user?.office_division || initialForm.officeDivision,
+  }));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -91,9 +99,16 @@ function CtoForm({ balance, onBackToDashboard }) {
           <h1>File Compensatory Time-Off</h1>
           <p className={styles.subtitle}>Provide your request details and submit to generate a downloadable PDF.</p>
         </div>
-        <button type="button" className={styles.secondaryButton} onClick={onBackToDashboard}>
-          Back to Dashboard
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button type="button" className={styles.secondaryButton} onClick={onBackToDashboard}>
+            Back to Dashboard
+          </button>
+          {onLogout ? (
+            <button type="button" className={styles.secondaryButton} onClick={onLogout}>
+              Logout
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <form className={styles.formCard} onSubmit={handleSubmit}>

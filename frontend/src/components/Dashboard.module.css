@@ -38,8 +38,16 @@
   text-align: center;
 }
 
-.logoutButton {
+.heroActions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
   margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.logoutButton,
+.adminLink {
   border: none;
   border-radius: 999px;
   padding: 0.55rem 0.9rem;
@@ -47,6 +55,7 @@
   color: white;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .balanceLabel {

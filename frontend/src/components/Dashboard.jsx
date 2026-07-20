@@ -1,6 +1,7 @@
+import { Link } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 
-function Dashboard({ balance, ledger, onOpenAddModal, onOpenForm, onDelete, onEdit, syncError, onLogout }) {
+function Dashboard({ balance, ledger, onOpenAddModal, onOpenForm, onDelete, onEdit, syncError, onRetry, onLogout, isAdmin }) {
   return (
     <div className={styles.dashboard}>
       <section className={styles.heroCard}>
@@ -14,16 +15,26 @@ function Dashboard({ balance, ledger, onOpenAddModal, onOpenForm, onDelete, onEd
         <div className={styles.balanceBox}>
           <span className={styles.balanceLabel}>Available Balance</span>
           <strong className={styles.balanceValue}>{balance} hrs</strong>
-          {onLogout ? (
-            <button type="button" className={styles.logoutButton} onClick={onLogout}>
-              Logout
-            </button>
-          ) : null}
+          <div className={styles.heroActions}>
+            {isAdmin ? (
+              <Link to="/admin" className={styles.adminLink}>Admin Panel</Link>
+            ) : null}
+            {onLogout ? (
+              <button type="button" className={styles.logoutButton} onClick={onLogout}>
+                Logout
+              </button>
+            ) : null}
+          </div>
         </div>
       </section>
 
       {syncError ? (
-        <div className={styles.syncBanner} role="status">Sync issue: {syncError} <button className={styles.retry} onClick={() => typeof onRetry === 'function' && onRetry()}>Retry</button></div>
+        <div className={styles.syncBanner} role="status">
+          Sync issue: {syncError}
+          <button className={styles.retry} onClick={() => typeof onRetry === 'function' && onRetry()}>
+            Retry
+          </button>
+        </div>
       ) : null}
 
       <section className={styles.contentGrid}>
@@ -31,7 +42,9 @@ function Dashboard({ balance, ledger, onOpenAddModal, onOpenForm, onDelete, onEd
           <div className={styles.panelHeader}>
             <div>
               <h2>Overtime Credits Ledger</h2>
-              <p className={styles.panelSubtitle}>Review credit entries and update them as needed.</p>
+              <p className={styles.panelSubtitle}>
+                Review your credit entries and file a CTO request.
+              </p>
             </div>
             <button type="button" className={styles.primaryButton} onClick={onOpenForm}>
               File New CTO
@@ -45,7 +58,7 @@ function Dashboard({ balance, ledger, onOpenAddModal, onOpenForm, onDelete, onEd
                   <th>Date</th>
                   <th>Hours</th>
                   <th>Remarks</th>
-                  <th></th>
+                  <th>{isAdmin ? 'Actions' : ''}</th>
                 </tr>
               </thead>
               <tbody>
@@ -55,8 +68,14 @@ function Dashboard({ balance, ledger, onOpenAddModal, onOpenForm, onDelete, onEd
                     <td>{entry.hours}</td>
                     <td>{entry.remarks}</td>
                     <td>
-                      <button className={styles.rowEdit} onClick={() => onEdit && onEdit(entry)}>Edit</button>
-                      <button className={styles.rowDelete} onClick={() => onDelete && onDelete(entry.id)} aria-label="Delete">Delete</button>
+                      {isAdmin ? (
+                        <>
+                          <button className={styles.rowEdit} onClick={() => onEdit && onEdit(entry)}>Edit</button>
+                          <button className={styles.rowDelete} onClick={() => onDelete && onDelete(entry.id)} aria-label="Delete">Delete</button>
+                        </>
+                      ) : (
+                        <span className={styles.noActions}>View only</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -64,9 +83,11 @@ function Dashboard({ balance, ledger, onOpenAddModal, onOpenForm, onDelete, onEd
             </table>
           </div>
 
-          <button type="button" className={styles.secondaryButton} onClick={onOpenAddModal}>
-            Add Credit Entry
-          </button>
+          {isAdmin ? (
+            <button type="button" className={styles.secondaryButton} onClick={onOpenAddModal}>
+              Add Credit Entry
+            </button>
+          ) : null}
         </div>
       </section>
     </div>

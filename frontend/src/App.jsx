@@ -8,6 +8,7 @@ import EditCreditModal from './components/EditCreditModal';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import { useAuth } from './context/AuthContext';
 
 const initialLedger = [
@@ -17,11 +18,11 @@ const initialLedger = [
 
 function App() {
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
-  const [view, setView] = useState('dashboard');
+  const { isAuthenticated, logout, token, user } = useAuth();
+  const storageKey = user?.id ? `cto_ledger_${user.id}` : 'cto_ledger_guest';
   const [ledger, setLedger] = useState(() => {
     try {
-      const raw = localStorage.getItem('cto_ledger');
+      const raw = localStorage.getItem('cto_ledger_guest');
       return raw ? JSON.parse(raw) : initialLedger;
     } catch (e) {
       return initialLedger;
@@ -55,7 +56,10 @@ function App() {
     const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5600';
     fetch(`${apiBase}/api/ledger`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ date: payload.date, hours: payload.hours, remarks: payload.remarks }),
     })
       .then((r) => {
@@ -73,16 +77,25 @@ function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('cto_ledger', JSON.stringify(ledger));
+      localStorage.setItem(storageKey, JSON.stringify(ledger));
     } catch (e) {
       // ignore
     }
-  }, [ledger]);
+  }, [ledger, storageKey]);
 
   // on mount try to load from server and prefer it when available
   const refreshFromServer = () => {
+    if (!token) {
+      setLedger([]);
+      return Promise.resolve([]);
+    }
+
     const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5600';
-    return fetch(`${apiBase}/api/ledger`)
+    return fetch(`${apiBase}/api/ledger`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((r) => {
         if (!r.ok) throw new Error('no-server');
         return r.json();
@@ -99,8 +112,13 @@ function App() {
   };
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setLedger([]);
+      return;
+    }
+
     refreshFromServer().catch(() => {});
-  }, []);
+  }, [isAuthenticated, token, user?.id]);
 
   const deleteLedgerEntry = (id) => {
     // optimistic remove
@@ -111,7 +129,12 @@ function App() {
     if (String(id).startsWith('temp-')) return;
 
     const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5600';
-    fetch(`${apiBase}/api/ledger/${id}`, { method: 'DELETE' })
+    fetch(`${apiBase}/api/ledger/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((r) => {
         if (!r.ok) throw new Error('delete-failed');
         setSyncError('');
@@ -140,7 +163,10 @@ function App() {
     const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5600';
     fetch(`${apiBase}/api/ledger/${payload.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ date: payload.date, hours: payload.hours, remarks: payload.remarks }),
     })
       .then((r) => {
@@ -159,6 +185,7 @@ function App() {
 
   const handleLogout = () => {
     logout();
+    setLedger([]);
     navigate('/login');
   };
 
@@ -176,12 +203,13 @@ function App() {
                   balance={balance}
                   ledger={ledger}
                   onOpenAddModal={handleAddEntry}
-                  onOpenForm={() => setView('form')}
+                  onOpenForm={() => navigate('/cto-form')}
                   onDelete={deleteLedgerEntry}
                   onEdit={openEdit}
                   syncError={syncError}
                   onRetry={refreshFromServer}
                   onLogout={handleLogout}
+                  isAdmin={user?.role === 'admin'}
                 />
                 <AddCreditModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} onSave={addLedgerEntry} />
                 <EditCreditModal isOpen={isEditOpen} entry={editingEntry} onClose={() => setIsEditOpen(false)} onSave={saveEdit} />
@@ -193,7 +221,15 @@ function App() {
           path="/cto-form"
           element={
             <ProtectedRoute>
-              <CtoForm balance={balance} onBackToDashboard={() => navigate('/dashboard')} />
+              <CtoForm balance={balance} onBackToDashboard={() => navigate('/dashboard')} onLogout={handleLogout} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              {user?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/dashboard" replace />}
             </ProtectedRoute>
           }
         />

@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import styles from './AuthPage.module.css';
 
 const initialForm = {
-  email: '',
   password: '',
   full_name: '',
   employee_no: '',
@@ -36,7 +35,6 @@ function Register() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: form.email.trim(),
           password: form.password,
           full_name: form.full_name.trim(),
           employee_no: form.employee_no.trim(),
@@ -70,10 +68,6 @@ function Register() {
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.formGrid}>
-            <label>
-              Email
-              <input type="email" name="email" value={form.email} onChange={handleChange} required />
-            </label>
             <label>
               Password
               <input type="password" name="password" value={form.password} onChange={handleChange} required />
