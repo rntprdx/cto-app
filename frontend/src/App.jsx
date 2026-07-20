@@ -9,6 +9,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminSearch from './pages/admin/AdminSearch';
+import AdminCreditHistory from './pages/admin/AdminCreditHistory';
+import AdminEmployeeManagement from './pages/admin/AdminEmployeeManagement';
 import { useAuth } from './context/AuthContext';
 
 const initialLedger = [
@@ -232,7 +235,12 @@ function App() {
               {user?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/dashboard" replace />}
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<Navigate to="search" replace />} />
+          <Route path="search" element={<AdminSearch />} />
+          <Route path="history" element={<AdminCreditHistory />} />
+          <Route path="manage" element={<AdminEmployeeManagement />} />
+        </Route>
         <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
       </Routes>
     </main>

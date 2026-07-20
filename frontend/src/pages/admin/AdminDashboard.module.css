@@ -31,6 +31,26 @@
   font-weight: 600;
 }
 
+.tab {
+  margin-right: 0.75rem;
+  padding: 0.7rem 1rem;
+  border-radius: 1rem;
+  background: #f8fafc;
+  color: #334155;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.activeTab {
+  margin-right: 0.75rem;
+  padding: 0.7rem 1rem;
+  border-radius: 1rem;
+  background: #2563eb;
+  color: white;
+  text-decoration: none;
+  border: 1px solid #2563eb;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
